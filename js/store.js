@@ -68,7 +68,9 @@ export const Store = class extends EventTarget {
   }
   randomTimes(times) {
     const result = [];
-    new Array(times).fill(0).forEach(() => result.push(this.randomOne()))
+    for (let i =0;i<times;i++) {
+      result.push(this.randomOne())
+    }
     return result;
   }
   getCircle(restart) {
@@ -78,6 +80,7 @@ export const Store = class extends EventTarget {
     return result
   }
   getPlan() {
+
     const getSumKa = (arr) => {
       let s = 0;
       arr.forEach(a => s = s + parseInt(a.ka))
@@ -97,6 +100,7 @@ export const Store = class extends EventTarget {
     while (getSumKa(thisPlan) > this.maxKa) {
       thisPlan = this.randomTimes(this.numDay)
     }
+
     return {
       plan: thisPlan,
       sum: getSumKa(thisPlan)

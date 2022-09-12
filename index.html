@@ -1,68 +1,177 @@
 <!DOCTYPE html>
 <html lang="cn" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css"
+    />
+    <title>我该吃什么</title>
+    <link rel="stylesheet" href="css/index.css" />
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
+    <link rel="manifest" href="/manifest.json" />
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
-  <title>我该吃什么</title>
-  <link rel="stylesheet" href="css/index.css">
-  <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
-  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-  <link rel="manifest" href="/manifest.json">
-</head>
-
-<body>
-  <main class="container">
-    <h1 id="title">我该吃什么</h1>
-    <hr>
-    <div class="page" data-page="setting" data-title="设置">
-      <a  href="#setting-data" role="button">菜品管理</a>
-      <a  href="#setting-get" role="button">抽取设置</a>
-      <button class="secondary" id="importBtn" >导入</button>
-      <input type="file" multiple="false" accept=".json" id="fileInput" style="display: none;">
-      <button class="secondary" id="exportBtn">导出</button>
-      <a role="button" href="#main" class="secondary">返回</a>
-    </div>
-    <div class="page" data-page="setting-get" data-title="设置-抽取设置">
-      <label for="maxKa">预算(大卡)</label>
-      <input type='number' id="maxKa" placeholder="输入一天的预算(大卡)" autocomplete="off">
-      <label for="numDay">几顿饭</label>
-      <input type='number' id="numDay"  placeholder="吃几顿饭" autocomplete="off">
-      <button id="saveSettingBtn">保存</button>
-      <a role="button" href="#setting" class="secondary">返回</a>
-    </div>
-    <div class="page" data-page="setting-data" data-title="设置-菜品管理">
-      <input type='text' id="name" placeholder="输入要添加的菜名" autocomplete="off">
-      <input type='text' id="ka" placeholder="输入菜品能量(大卡)" autocomplete="off">
-      <button id="addBtn">添加</button>
-      <a role="button" href="#setting" class="secondary">返回</a>
-      <table>
-        <thead>
-          <tr>
-            <th scope="col">名称</th>
-            <th scope="col">能量(大卡)</th>
-            <th scope="col">操作</th>
-          </tr>
-        </thead>
-        <tbody id="table-body">
-        </tbody>
-      </table>
-    </div>
-    <div class="page" data-page="main" data-title="我该吃什么">
-      <button id="getOneBtn">抽取一次</button>
-      <button id="getDayBtn">抽取一天菜单</button>
-      <a role="button" href="#setting" class="secondary">设置</a>
-      <pre>
+  <body>
+    <main class="container">
+      <h1 id="title" data-text-key="title" data-type="text">我该吃什么</h1>
+      <hr />
+      <div class="page" data-page="setting" data-title-key="title">
+        <a
+          href="#setting-data"
+          role="button"
+          data-text-key="settingData"
+          data-type="text"
+          >菜品管理</a
+        >
+        <a
+          href="#setting-get"
+          role="button"
+          data-text-key="settingGet"
+          data-type="text"
+          >抽取设置</a
+        >
+        <button id="language">中文</button>
+        <button
+          class="secondary"
+          id="importBtn"
+          data-text-key="import"
+          data-type="text"
+        >
+          导入
+        </button>
+        <input
+          type="file"
+          multiple="false"
+          accept=".json"
+          id="fileInput"
+          style="display: none"
+        />
+        <button
+          class="secondary"
+          id="exportBtn"
+          data-text-key="export"
+          data-type="text"
+        >
+          导出
+        </button>
+        <a
+          role="button"
+          href="#main"
+          class="secondary"
+          data-text-key="back"
+          data-type="text"
+          >返回</a
+        >
+      </div>
+      <div class="page" data-page="setting-get" data-title-key="settingGet">
+        <label for="maxKa" data-text-key="maxKa" data-type="text"
+          >预算(大卡)</label
+        >
+        <input
+          type="number"
+          id="maxKa"
+          placeholder="输入一天的预算(大卡)"
+          autocomplete="off"
+          data-text-key="maxKaPlaceholder"
+          data-type="placeholder"
+        />
+        <label for="numDay" data-text-key="numDay" data-type="text"
+          >几顿饭</label
+        >
+        <input
+          type="number"
+          id="numDay"
+          placeholder="吃几顿饭"
+          autocomplete="off"
+          data-text-key="numDayPlaceholder"
+          data-type="placeholder"
+        />
+        <button id="saveSettingBtn" data-text-key="save" data-type="text">
+          保存
+        </button>
+        <a
+          role="button"
+          href="#setting"
+          class="secondary"
+          data-text-key="back"
+          data-type="text"
+          >返回</a
+        >
+      </div>
+      <div class="page" data-page="setting-data" data-title-key="settingData">
+        <input
+          type="text"
+          id="name"
+          placeholder="输入要添加的菜名"
+          autocomplete="off"
+          data-text-key="namePlaceholder"
+          data-type="placeholder"
+        />
+        <input
+          type="text"
+          id="ka"
+          placeholder="输入菜品能量(大卡)"
+          autocomplete="off"
+          data-text-key="kaPlaceholder"
+          data-type="placeholder"
+        />
+        <button id="addBtn" data-text-key="add" data-type="text">添加</button>
+        <a
+          role="button"
+          href="#setting"
+          class="secondary"
+          data-text-key="back"
+          data-type="text"
+          >返回</a
+        >
+        <table>
+          <thead>
+            <tr>
+              <th scope="col" data-text-key="name" data-type="text">名称</th>
+              <th scope="col" data-text-key="energy" data-type="text">
+                能量(大卡)
+              </th>
+              <th scope="col" data-text-key="action" data-type="text">操作</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+      <div class="page" data-page="main" data-title-key="title">
+        <button id="getOneBtn" data-text-key="getOne" data-type="text">
+          抽取一次
+        </button>
+        <button id="getDayBtn" data-text-key="getPlan" data-type="text">
+          抽取一天菜单
+        </button>
+        <a
+          role="button"
+          href="#setting"
+          class="secondary"
+          data-text-key="setting"
+          data-type="text"
+          >设置</a
+        >
+        <pre>
         <code id="answer" data-type="one">
-        <p>点击按钮开启抽取</p>
+        <p data-text-key="clickToStart" data-type="text">点击按钮开启抽取</p>
         </code>
       </pre>
-    </div>
-  </main>
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-  <script src="js/app.js" type="module"></script>
-</body>
-
+      </div>
+    </main>
+    <footer><a href="https://github.com/Mereithhh/eat" target="_blank">Github</a></footer>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/toastify-js"
+    ></script>
+    <script src="js/app.js" type="module"></script>
+  </body>
 </html>

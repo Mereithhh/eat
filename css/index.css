@@ -1,7 +1,9 @@
 .page {
   display: none;
 }
-
+footer {
+  text-align: center;
+}
 table th,
 td {
   text-align: center;
