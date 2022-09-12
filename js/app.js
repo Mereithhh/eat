@@ -8,7 +8,11 @@ class App {
   init(config) {
     this.store = new Store()
     this.config = config
-    this.lang = window.localStorage.getItem("lang") || "en"
+    this.lang = window.localStorage.getItem("lang")
+    if (!lang) {
+      window.localStorage.setItem('lang','en')
+      this.lang = 'en'
+    }
     this.langMap = this.lang == 'en' ? en : zh;
     this.els = {
       pages: document.querySelectorAll(`.page`),
