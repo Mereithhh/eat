@@ -16,6 +16,16 @@ export const Store = class extends EventTarget {
     localStorage.setItem(this.localStorageKey, JSON.stringify(this.data));
     this.dispatchEvent(new CustomEvent('save'))
   }
+  load(data) {
+    if (data.numDay) {
+      localStorage.setItem('numDay', parseInt(data.numDay));
+    }
+    if (data.maxKa) {
+      localStorage.setItem('maxKa', parseInt(data.maxKa));
+    }
+    this.data = data.items;
+    this._save();
+  }
   add(item) {
 
     const cur = this.data.find((each) => each.name === item.name)

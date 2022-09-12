@@ -18,7 +18,10 @@ const App = {
     saveSettingBtn: document.querySelector("#saveSettingBtn"),
     answer: document.querySelector("#answer"),
     getDayBtn: document.querySelector("#getDayBtn"),
+    importBtn: document.querySelector("#importBtn"),
+    exportBtn: document.querySelector("#exportBtn"),
     inputNumDay: document.querySelector("#numDay"),
+    fileInput: document.querySelector("#fileInput")
   },
   bindEvent(event, el, handler) {
     el.addEventListener(event, (e) => { handler(e) })
@@ -45,6 +48,38 @@ const App = {
           setHash(path)
         }
       })
+    })
+    App.$.fileInput.addEventListener("change",function() {
+      const reader = new FileReader();
+      reader.onload = function fileReadCompleted() {
+        // 当读取完成时，内容只在`reader.result`中
+        const data = JSON.parse(reader.result)
+        Data.load(data);
+        Toastify({
+          text: "导入成功！",
+        }).showToast();
+        App.$.fileInput.value = ''
+      };
+      reader.readAsText(this.files[0]);
+
+    })
+    App.$.importBtn.addEventListener("click",() => {
+      App.$.fileInput.click();
+    })
+    App.$.exportBtn.addEventListener("click",() => {
+      const maxKa = parseInt(localStorage.getItem("maxKa"))
+      const numDay = parseInt(localStorage.getItem("numDay"))
+      const toExport = JSON.stringify({
+        items: Data.data,
+        maxKa: isNaN(maxKa) ? undefined : maxKa,
+        numDay: isNaN(numDay) ? undefined : numDay,
+      },null,2);
+      const data = new Blob([toExport]);
+      const url = URL.createObjectURL(data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `export-${new Date().toLocaleTimeString()}.json`;
+      link.click();
     })
     App.$.saveSettingBtn.addEventListener('click', () => {
       localStorage.setItem("maxKa", Number(App.$.inputMaxKa.value))
