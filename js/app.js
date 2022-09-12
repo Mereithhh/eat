@@ -1,126 +1,92 @@
-import { getURLHash, setHash, sleep } from "./helper.js";
+import { addEvent, getURLHash,  success} from "./helper.js";
 import { Store } from "./store.js";
 
-const Data = new Store('eatItems');
 
-const App = {
-  $: {
-    page: (name) => document.querySelector(`[data-page="${name}"]`),
-    routerBtns: document.querySelectorAll(`[data-role="router"]`),
-    pages: document.querySelectorAll('.page'),
-    title: document.querySelector('#title'),
-    addBtn: document.querySelector("#addBtn"),
-    inputName: document.querySelector("#name"),
-    inputKa: document.querySelector("#ka"),
-    inputMaxKa: document.querySelector("#maxKa"),
-    listBody: document.querySelector("#table-body"),
-    getOneBtn: document.querySelector("#getOneBtn"),
-    saveSettingBtn: document.querySelector("#saveSettingBtn"),
-    answer: document.querySelector("#answer"),
-    getDayBtn: document.querySelector("#getDayBtn"),
-    importBtn: document.querySelector("#importBtn"),
-    exportBtn: document.querySelector("#exportBtn"),
-    inputNumDay: document.querySelector("#numDay"),
-    fileInput: document.querySelector("#fileInput")
-  },
-  bindEvent(event, el, handler) {
-    el.addEventListener(event, (e) => { handler(e) })
-  },
-  init(times) {
-    Data.addEventListener('save', App.render);
-    window.onhashchange = App.render;
-    App.bindEvent('click', App.$.addBtn, () => {
-      const r = Data.add({ name: App.$.inputName.value, ka: Number(App.$.inputKa.value) })
-      App.$.inputKa.value = "";
-      App.$.inputName.value = ""
-      if (r) {
-        Toastify({
-          text: "添加成功！",
-        }).showToast();
-      }
-    })
-    App.$.routerBtns.forEach(btn => {
-      const path = btn.getAttribute("data-path")
-      btn.addEventListener('click', () => {
-        if (path == 'back') {
-          history.go(-1)
-        } else {
-          setHash(path)
-        }
-      })
-    })
-    App.$.fileInput.addEventListener("change",function() {
+class App {
+  
+  init(config) {
+    this.store = new Store()
+    this.config = config
+    this.els = {
+      pages: document.querySelectorAll(`.page`),
+      routerBtns: document.querySelector(`[data-role="router"]`),
+      page: (name) => document.querySelector(`[data-page="${name}"]`),
+      title: document.querySelector('#title'),
+      addBtn: document.querySelector("#addBtn"),
+      inputName: document.querySelector("#name"),
+      inputKa: document.querySelector("#ka"),
+      inputMaxKa: document.querySelector("#maxKa"),
+      listBody: document.querySelector("#table-body"),
+      getOneBtn: document.querySelector("#getOneBtn"),
+      saveSettingBtn: document.querySelector("#saveSettingBtn"),
+      answer: document.querySelector("#answer"),
+      getDayBtn: document.querySelector("#getDayBtn"),
+      importBtn: document.querySelector("#importBtn"),
+      exportBtn: document.querySelector("#exportBtn"),
+      inputNumDay: document.querySelector("#numDay"),
+      fileInput: document.querySelector("#fileInput")
+    }
+    this.bindEvent();
+    this.render();
+  }
+  bindEvent() {
+    addEvent(this.els.addBtn,'click',()=> this.addItem())
+    addEvent(this.els.importBtn,'click',() => this.els.fileInput.click())
+    addEvent(this.els.fileInput,'change',() => {
       const reader = new FileReader();
-      reader.onload = function fileReadCompleted() {
-        // 当读取完成时，内容只在`reader.result`中
+      reader.onload = () => {
         const data = JSON.parse(reader.result)
-        Data.load(data);
-        Toastify({
-          text: "导入成功！",
-        }).showToast();
-        App.$.fileInput.value = ''
-      };
-      reader.readAsText(this.files[0]);
-
+        this.store.load(data);
+        success("导入成功！")
+        this.els.fileInput.value = ''
+      }
+      reader.readAsText(this.els.fileInput.files[0]);
     })
-    App.$.importBtn.addEventListener("click",() => {
-      App.$.fileInput.click();
-    })
-    App.$.exportBtn.addEventListener("click",() => {
-      const maxKa = parseInt(localStorage.getItem("maxKa"))
-      const numDay = parseInt(localStorage.getItem("numDay"))
-      const toExport = JSON.stringify({
-        items: Data.data,
-        maxKa: isNaN(maxKa) ? undefined : maxKa,
-        numDay: isNaN(numDay) ? undefined : numDay,
-      },null,2);
-      const data = new Blob([toExport]);
+    addEvent(this.els.exportBtn,'click',() => {
+      const data = new Blob([JSON.stringify(this.store.export(),null,2)]);
       const url = URL.createObjectURL(data);
       const link = document.createElement('a');
       link.href = url;
       link.download = `export-${new Date().toLocaleTimeString()}.json`;
       link.click();
     })
-    App.$.saveSettingBtn.addEventListener('click', () => {
-      localStorage.setItem("maxKa", Number(App.$.inputMaxKa.value))
-      localStorage.setItem("numDay", Number(App.$.inputNumDay.value))
-      Toastify({
-        text: "保存成功！",
-      }).showToast();
-      history.go(-1)
+    addEvent(this.els.saveSettingBtn,'click',() => {
+      const numDay  = Number(this.els.inputNumDay.value)
+      const maxKa = Number(this.els.inputMaxKa.value)
+      if (maxKa && maxKa > 0) this.store.setMaxKa(maxKa)
+      if (numDay && numDay > 0) this.store.setNumDay(numDay)
+      success("保存成功！")
     })
-    App.$.getDayBtn.addEventListener('click', async () => {
-      if (Data.data.length == 0) {
-        alert("请先添加菜单！")
-        return;
-      }
-      const maxKa = parseInt(localStorage.getItem("maxKa"))
-      const numDay = parseInt(localStorage.getItem("numDay"))
+    addEvent(this.els.getOneBtn,'click',()=>this.getOne())
+    addEvent(this.els.getDayBtn,'click',()=>this.getDay())
+    this.store.addEventListener('save', ()=>this.render());
+    window.onhashchange = ()=>{this.render()};
+  }
+  getOne() {
+    if (!this.store.check()) alert("请先添加菜单！")
+    const result = this.store.randomOne()
+    this.els.answer.innerHTML = `<p>${result.name}(${result.ka}大卡)</p>`
+    success("抽取完成！",700)
+  }
+  getDay() {
+    if (!this.store.check()) alert("请先添加菜单！")
+    if (!this.store.check(true)) alert("请先设置抽取配置！")
+    this.rendPlan(this.store.getPlan())
+    success("抽取完成！",700)
+  }
 
-      const ok = [maxKa, numDay].every(e => !isNaN(e))
-      if (!ok) {
-        alert("请先在设置中设置抽取信息！")
-        return;
-      }
-      App.renderDayResult(Data.getDay(numDay, maxKa))
-    })
-    App.bindEvent('click', App.$.getOneBtn, async () => {
-      if (Data.data.length == 0) {
-        alert("请先添加菜单！")
-        return;
-      }
-      for (let i = 0; i < times; i++) {
-        await sleep(50);
-        const temp = Data.getCircle()
-        App.$.answer.innerHTML = `<p>${temp.name}</p>`
-      }
-      const result = Data.randomOne()
-      App.$.answer.innerHTML = `<p>${result.name}(${result.ka}大卡)</p>`
-    })
-    App.render();
-  },
-  renderDayResult({ plan, sum }) {
-    const renderFn = () => {
+  addItem() {
+    if (isNaN(Number(this.els.inputKa.value))) {
+      alert("能量必须填数字！")
+      return 
+    }
+    const r = this.store.addItem({ name: this.els.inputName.value, ka: Number(this.els.inputKa.value) })
+    this.els.inputKa.value = "";
+    this.els.inputName.value = ""
+    if (r) success("添加成功！")
+  }
+  rendPlan({plan,sum}) {
+    const rendFn = () => {
       let s = ``;
       plan.forEach(item => {
         s = s + `<tr>
@@ -130,7 +96,7 @@ const App = {
       })
       return s
     }
-    App.$.answer.innerHTML = `
+    this.els.answer.innerHTML = `
     <table>
         <thead>
           <tr>
@@ -139,7 +105,7 @@ const App = {
           </tr>
         </thead>
         <tbody id="table-body">
-          ${renderFn()}
+          ${rendFn()}
           <tr>
             <th scope="col">总计</th>
             <td>${sum}</td>
@@ -147,56 +113,44 @@ const App = {
         </tbody>
       </table>
     `
-  },
-  renderList() {
-    App.$.listBody.innerHTML = "";
-    Data.data.forEach(item => {
+  }
+  rendList() {
+    this.els.listBody.innerHTML = "";
+    this.store.data.forEach(item => {
       const tr = document.createElement('tr')
       const th = document.createElement('th')
       const td = document.createElement('td')
       const tdKa = document.createElement('td')
       const btn = document.createElement('a')
       tdKa.innerHTML = item.ka;
-      th.scope = "raw"
+      th.scope = "row"
       th.innerHTML = item.name;
-      btn.style.outline = 'none'
       btn.onclick = () => {
-        Data.remove(item)
-        Toastify({
-          text: "删除成功！",
-        }).showToast();
+        this.store.removeItem(item)
+        success("删除成功！")
       }
       btn.innerText = '删除'
       td.appendChild(btn)
       tr.appendChild(th)
       tr.appendChild(tdKa)
       tr.appendChild(td)
-      App.$.listBody.appendChild(tr)
+      this.els.listBody.appendChild(tr)
     })
-  },
-  togglePage(pageName) {
-    App.$.pages.forEach(p => {
-      p.classList.remove("active")
-    })
-    App.$.page(pageName).classList.add("active")
-    if (pageName == "setting-data") {
-      App.renderList();
-    }
-    if (pageName == "setting-get") {
-      const maxKa = parseInt(localStorage.getItem("maxKa"))
-      const numDay = parseInt(localStorage.getItem("numDay"))
-      if (!isNaN(maxKa)) {
-        App.$.inputMaxKa.value = maxKa
-      }
-      if (!isNaN(numDay)) {
-        App.$.inputNumDay.value = numDay
-      }
-    }
-    App.$.title.innerHTML = App.$.page(pageName).getAttribute("data-title")
-  },
+  }
+  renderConfig() {
+    if (this.store.maxKa) this.els.inputMaxKa.value = this.store.maxKa
+    if (this.store.numDay) this.els.inputNumDay.value = this.store.numDay
+  }
+  rendPage(name) {
+    this.els.pages.forEach(p => p.classList.remove("active"))
+    this.els.page(name).classList.add('active')
+    if (name == 'setting-data') this.rendList()
+    if (name == "setting-get") this.renderConfig()
+    this.els.title.innerHTML = this.els.page(name).getAttribute('data-title')
+  }
   render() {
-    App.togglePage(getURLHash() || 'main')
+    this.rendPage(getURLHash() || "main")
   }
 }
-
-App.init(10);
+const eatApp = new App();
+eatApp.init()

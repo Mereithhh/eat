@@ -32,6 +32,10 @@ table a {
   margin-bottom: 0;
   font-size: x-large;
 }
+a[role="button"] {
+  width: 100%;
+  margin-bottom: var(--spacing);
+}
 
 h1 {
   margin-bottom: 0;
