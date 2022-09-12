@@ -27,9 +27,14 @@ const App = {
     Data.addEventListener('save', App.render);
     window.onhashchange = App.render;
     App.bindEvent('click', App.$.addBtn, () => {
-      Data.add({ name: App.$.inputName.value, ka: Number(App.$.inputKa.value) })
+      const r = Data.add({ name: App.$.inputName.value, ka: Number(App.$.inputKa.value) })
       App.$.inputKa.value = "";
       App.$.inputName.value = ""
+      if (r) {
+        Toastify({
+          text: "添加成功！",
+        }).showToast();
+      }
     })
     App.$.routerBtns.forEach(btn => {
       const path = btn.getAttribute("data-path")
@@ -44,6 +49,10 @@ const App = {
     App.$.saveSettingBtn.addEventListener('click', () => {
       localStorage.setItem("maxKa", Number(App.$.inputMaxKa.value))
       localStorage.setItem("numDay", Number(App.$.inputNumDay.value))
+      Toastify({
+        text: "保存成功！",
+      }).showToast();
+      history.go(-1)
     })
     App.$.getDayBtn.addEventListener('click', async () => {
       if (Data.data.length == 0) {
@@ -118,6 +127,9 @@ const App = {
       btn.style.outline = 'none'
       btn.onclick = () => {
         Data.remove(item)
+        Toastify({
+          text: "删除成功！",
+        }).showToast();
       }
       btn.innerText = '删除'
       td.appendChild(btn)

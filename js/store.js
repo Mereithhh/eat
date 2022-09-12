@@ -21,10 +21,11 @@ export const Store = class extends EventTarget {
     const cur = this.data.find((each) => each.name === item.name)
     if (cur) {
       alert("不可重复添加！")
-      return;
+      return false;
     }
     this.data.push({ ...item, id: "_id" + Date.now() })
     this._save();
+    return true;
   }
   remove({ id }) {
     this.data = this.data.filter(item => item.id !== id);
