@@ -1,0 +1,46 @@
+.page {
+  display: none;
+}
+
+table th,
+td {
+  text-align: center;
+}
+
+table a {
+  cursor: pointer;
+}
+
+.page.active {
+  display: block;
+}
+
+#answer {
+  min-height: 150px;
+}
+
+#answer[data-type="one"] {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+#answer p {
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 0;
+  font-size: x-large;
+}
+
+h1 {
+  margin-bottom: 0;
+}
+
+h3 {
+  margin-bottom: 20px;
+}
+
+hr {
+  margin-bottom: 20px;
+}

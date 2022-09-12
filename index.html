@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="cn" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+  <title>我该吃什么</title>
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+</head>
+
+<body>
+  <main class="container">
+    <h1 id="title">我该吃什么</h1>
+    <hr>
+    <div class="page" data-page="setting" data-title="设置">
+      <button data-role="router" data-path="setting-data" id="goDataBtn">菜品管理</button>
+      <button data-role="router" data-path="setting-get" id="goGetBtn">抽取设置</button>
+      <button data-role="router" data-path="back" class="secondary">返回</button>
+    </div>
+    <div class="page" data-page="setting-get" data-title="抽取设置">
+      <label for="maxKa">预算(大卡)</label>
+      <input type='number' id="maxKa" placeholder="输入一天的预算(大卡)" autocomplete="off">
+      <label for="numDay">几顿饭</label>
+      <input type='number' id="numDay" max=5 placeholder="吃几顿饭" autocomplete="off">
+      <button id="saveSettingBtn">保存</button>
+      <button data-role="router" data-path="back" class="secondary">返回</button>
+    </div>
+    <div class="page" data-page="setting-data" data-title="菜品管理">
+      <input type='text' id="name" placeholder="输入要添加的菜名" autocomplete="off">
+      <input type='text' id="ka" placeholder="输入菜品能量(大卡)" autocomplete="off">
+      <button id="addBtn">添加</button>
+      <button data-path="back" data-role="router" class="secondary">返回</button>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">名称</th>
+            <th scope="col">能量(大卡)</th>
+            <th scope="col">操作</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+
+        </tbody>
+      </table>
+    </div>
+    <div class="page" data-page="main" data-title="我该吃什么">
+      <button id="getOneBtn">抽取一次</button>
+      <button id="getDayBtn">抽取一天菜单</button>
+      <button data-role="router" data-path="setting" class="secondary">设置</button>
+      <pre>
+        <code id="answer" data-type="one">
+        <p>点击按钮开启抽取</p>
+        </code>
+      </pre>
+    </div>
+  </main>
+  <script src="js/app.js" type="module"></script>
+</body>
+
+</html>
