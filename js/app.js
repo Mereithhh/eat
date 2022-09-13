@@ -9,7 +9,7 @@ class App {
     this.store = new Store()
     this.config = config
     this.lang = window.localStorage.getItem("lang")
-    if (!lang) {
+    if (!this.lang) {
       window.localStorage.setItem('lang','en')
       this.lang = 'en'
     }
